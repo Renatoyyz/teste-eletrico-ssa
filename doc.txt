@@ -1,0 +1,60 @@
+Faça um código em MicroPython do raspberry pi pico que execute o seguinte:
+1 - Atravéz da entrada analogia ADC0 eu recebo a entrada vindo de um CI Multiplaxador (74HC4067)
+2 - Essa entrada é uma seleção feita pelas entradas A,B,C e D do Multplaxador.
+3 - Os pinos do raspberry são GPIO6 para A do Multiplexador, 
+                              GPIO7 para B do Multiplexador
+                              GPIO8 para C do Multiplexador
+                              GPIO9 para D do Multiplexador
+4 - O processo funciona assim
+    Quando a entrada GPIO0 for para 0 o sistema começa a varrer 8 entradas do Multiplexador e salva esse estado de cada entrada em variáveis.
+    Quando form para 1 novamente o processo para e aciona uma saída (GPIO1) se todas as entradas estiverem em 0, o que indica que tudo que foi medido externamente está OK, caso contrario não aciona a saída.
+
+Corrija o código para que select_channel selecione o multiplexador a partir do canal x8
+
+Como está no arquivo main.py. eu refiz o código acrescentando mux_pins_inferior (linha 7).
+Fiz iso para acrescentar mais um multiplexador para fazer a combinação de 4 entradas da seguinte forma:
+Chamemos o multiplexador inferior de U3 e do superior como U2, então:
+O x0 de U3 combina com x8 de U2.
+O x1 de U3 combina com x9 de U2.
+O x2 de U3 combina com x10 de U2.
+O x3 de U3 combina com x11de U2.
+O x0 de U3 combina com x12 de U2.
+O x1 de U3 combina com x13 de U2.
+O x2 de U3 combina com x14 de U2.
+O x3 de U3 combina com x15 de U2.
+ 
+ O código esta correto?
+
+ Crie um método select_channel_circuit_break que faz a mesma coisa que select_channel, conforme abaixo:
+ # Função para selecionar o canal dos multiplexadores a partir do canal x8
+def select_channel(channel):
+    channel += 8  # Ajusta o canal para começar a partir de x8
+    
+    # Seleciona o canal do multiplexador superior (U2)
+    for i in range(4):
+        mux_pins[i].value((channel >> i) & 1)
+    
+    # Seleciona o canal do multiplexador inferior (U3)
+    mux_pins_inferior[0].value((channel & 1))
+    mux_pins_inferior[1].value((channel >> 1) & 1)
+Só que ao invez de combinar x0 até x3 de U3 com x8 ate x11 e x12 até x15, faça uma combinação usando a propriedade de combinatória
+Cn,k onde n são 4 elementos e k é uma k-upla de 2 elementos.
+Dessa forma uma variável mux_pins_circuit_break e mux_pins_inferior_circuit_break armazena o estado dess combinação.
+
+Vamos contextualizar:
+x0 a x3 de U3 representa eletrodos inferiores que combinam com x8 a x11 de U2 que são eletrodos superiores esquerdo
+x0 a 03 de U3 também combinam com x12 a x15 de U2 que eletrodo superiores direitos.
+então:
+x0 de U3 e x8 de U2 fecham um circuito.
+x1 de U3 e x9 de U2 fecham um circuito
+......
+x3 de U3 e x11 de U2 fecham um circuito
+
+da mesma forma:
+x0 de U3 e x12 de U2 fecham um circuito.
+x1 de U3 e x13 de U2 fecham um circuito
+......
+x3 de U3 e x15 de U2 fecham um circuito
+o que eu quero é que, por exemplo:
+x0 de U3 combine com x9,x10 e x11 de U2, nesse contexto o x0 de U3 e x8 não podem combinar pois são curtos circuito.
+E essa lógica tem que ser para todos.
