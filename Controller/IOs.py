@@ -238,7 +238,65 @@ class IO_MODBUS:
         self.aciona_matriz(2,0)
         time.sleep(0.5)
 
+    def desaciona_pistoes_esquerdo(self):
+        # Agulhas inferiores
+        self.aciona_matriz(5,0)
+        time.sleep(0.5)
+        # Agulhas superiores
+        self.aciona_matriz(3,0)
+        time.sleep(0.5)
+        # Principais
+        self.aciona_matriz(1,0)
+        time.sleep(0.5)
 
+    def desaciona_pistoes_direito(self):
+        # Agulhas inferiores
+        self.aciona_matriz(6,0)
+        time.sleep(0.5)
+        # Agulhas superiores
+        self.aciona_matriz(4,0)
+        time.sleep(0.5)
+        # Principais
+        self.aciona_matriz(2,0)
+        time.sleep(0.5)
+
+    def passa_nao_passa_esquerdo(self, value):
+        if value == 1:
+            self.aciona_matriz(13,0)
+            self.aciona_matriz(15,1)
+        elif value == 0:
+            self.aciona_matriz(15,0)
+            self.aciona_matriz(13,1)
+        else:
+            return -1
+        
+    def passa_nao_passa_direito(self, value):
+        if value == 1:
+            self.aciona_matriz(14,0)
+            self.aciona_matriz(16,1)
+        elif value == 0:
+            self.aciona_matriz(16,0)
+            self.aciona_matriz(14,1)
+        else:
+            return -1
+
+    def aciona_marcacao_esquerdo(self):
+        self.aciona_matriz(10,1)
+        time.sleep(1)  
+        self.aciona_matriz(12,1)  
+        time.sleep(0.5)
+        self.aciona_matriz(12,0)
+        time.sleep(0.2)
+        self.aciona_matriz(10,0) 
+    
+    def aciona_marcacao_direito(self):
+        self.aciona_matriz(9,1)
+        time.sleep(1)  
+        self.aciona_matriz(11,1)  
+        time.sleep(0.5)
+        self.aciona_matriz(11,0)
+        time.sleep(0.2)
+        self.aciona_matriz(9,0)
     
     def reset_serial(self):
         try:

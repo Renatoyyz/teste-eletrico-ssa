@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import Qt, QThread, pyqtSignal,pyqtSlot, QMetaObject, Q_ARG
 import os
+import time
 from datetime import datetime
 
 from View.tela_inicial import Ui_fmTelaInicial
@@ -39,6 +40,7 @@ class ExecutaRotinaThread(QThread):
         self._running = True
         self.esquerda_ok =0
         self.direita_ok =0
+        self.TEMPO_TESTE = 5000
 
     def run(self):
         while self._running == True:
@@ -57,7 +59,7 @@ class ExecutaRotinaThread(QThread):
                     self.operacao.io.aciona_matriz(4,1)# Aciona AG_superior_2
                     self.msleep(1000) # Cria um atraso de 1 segundo
                     self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
-                    self.msleep(1000) # Cria um atraso de 1 segundo
+                    self.msleep(self.TEMPO_TESTE) # Cria um atraso para teste dos eletrodos
 
                     self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
                     self.msleep(1000) # Cria um atraso de 1 segundo
@@ -68,7 +70,7 @@ class ExecutaRotinaThread(QThread):
 
                     # Desabilita a rotina
                     self.operacao.inicia_rotina = False
-                    self.operacao._acionamento_botao = 0
+                    
                     # Emite o evento para conclusão so processo
                     self.sinal_execucao.emit(self.esquerda_ok,self.direita_ok)
                     # self.sinal_execucao.emit(0,0)
@@ -98,6 +100,9 @@ class TelaInicial(QMainWindow):
         self._acionamento_botao = 0
         self.pecas_aprovadas = 0
         self.pecas_reprovadas = 0
+        self.passou_nao_passou =False
+
+        self.quantidade_decarte = 0
 
         # Configuração da interface do usuário gerada pelo Qt Designer
         self.ui = Ui_fmTelaInicial()
@@ -112,8 +117,13 @@ class TelaInicial(QMainWindow):
             self.setWindowState(Qt.WindowState.WindowFullScreen)
 
         self.mouseReleaseEvent = self.setfoccus
+        self.ui.btReset.clicked.connect(self.sobe_pistoes)
+        self.ui.btZerar.clicked.connect(self.zerar_contadores)
 
         self.inicializa_threads()
+        self.ui.txaInformacoes.setText("Máquina Pronta.")
+        self.io.passa_nao_passa_direito(0)
+        self.io.passa_nao_passa_esquerdo(0)
 
     def inicializa_threads(self):
         # Atualizador Thread
@@ -133,10 +143,32 @@ class TelaInicial(QMainWindow):
 
     @pyqtSlot(str)
     def atualiza_valor(self, data_hora):
-        if self.io.io_rpi.bot_acio_e == 0 and self.io.io_rpi.bot_acio_d == 0:
+        if self.io.io_rpi.bot_acio_e == 0 and self.io.io_rpi.bot_acio_d == 0 and self.inicia_rotina == False:
             if self._acionamento_botao < 1:
+                self.ui.txaInformacoes.setText("Iniciando rotina de teste.")
+                self.io.passa_nao_passa_direito(0)
+                self.io.passa_nao_passa_esquerdo(0)
                 self.inicia_rotina = True # Inicia a rotina de teste
                 self._acionamento_botao += 1 # Incrementa a variável para evitar que a rotina seja iniciada mais de uma vez
+
+        if self.passou_nao_passou == True:
+            if self.io.io_rpi.sensor_descarte == 0:
+                time.sleep(0.4)
+                while self.io.io_rpi.sensor_descarte == 0:
+                    pass
+                self.quantidade_decarte -= 1
+                if self.quantidade_decarte <= 0:
+                    self.quantidade_decarte = 0
+                    self.passou_nao_passou = False
+                    self._acionamento_botao = 0
+                    self.ui.txaInformacoes.setText("Máquina Pronta.")
+
+        if self.inicia_rotina == True:
+            if self.io.io_rpi.contina_luz == 0:
+                self.inicia_rotina = False
+                self._acionamento_botao = 0
+                self.io.desaciona_pistoes()
+                self.ui.txaInformacoes.setText("Invasão detectada.\nConfira as peças a acione novamente.")
 
     def thread_execucao(self, esquerda, direita):
         QMetaObject.invokeMethod(self, "execucao", Qt.QueuedConnection, 
@@ -144,10 +176,73 @@ class TelaInicial(QMainWindow):
 
     @pyqtSlot(int, int)
     def execucao(self,  esquerda, direita):
-        if esquerda == 1 and direita == 1:
-            self.ui.lbPecasAprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{esquerda}</span></p></body></html>")
-            self.ui.lbPecasReprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{direita}</span></p></body></html>")
+        if self._acionamento_botao > 0:
+            if esquerda == 1 and direita == 1:
+                self.pecas_aprovadas += 2
+                self.ui.lbPecasAprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_aprovadas}</span></p></body></html>")
+                
+                self.io.passa_nao_passa_direito(1)
+                self.io.passa_nao_passa_esquerdo(1)
 
+                self.io.aciona_marcacao_esquerdo()
+                self.io.aciona_marcacao_direito()
+
+                self.io.desaciona_pistoes()
+                self.ui.txaInformacoes.setText("Peças aprovadas\nMáquina pronta.")
+
+                self._acionamento_botao = 0
+
+            elif esquerda == 0 and direita == 0:
+                self.pecas_reprovadas += 2
+                self.ui.lbPecasReprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_reprovadas}</span></p></body></html>")
+                self.ui.txaInformacoes.setText("Peças reprovadas\nPressione RESET para desativar pistões e descarte duas peças.")
+                self.io.passa_nao_passa_direito(0)
+                self.io.passa_nao_passa_esquerdo(0)
+            elif (esquerda == 0 and direita == 1):
+                self.pecas_aprovadas +=1
+                self.pecas_reprovadas += 1
+                self.ui.lbPecasAprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_aprovadas}</span></p></body></html>")
+                self.ui.lbPecasReprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_reprovadas}</span></p></body></html>")
+            
+                self.io.passa_nao_passa_direito(1)
+                self.io.passa_nao_passa_esquerdo(0)
+                self.io.aciona_marcacao_direito()
+
+                self.io.desaciona_pistoes_direito()
+                self.ui.txaInformacoes.setText("Peça reprovada\nPressione RESET para desativar pistões e descarte uma peça.")
+
+            elif (esquerda == 1 and direita == 0):
+                self.pecas_aprovadas +=1
+                self.pecas_reprovadas += 1
+                self.ui.lbPecasAprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_aprovadas}</span></p></body></html>")
+                self.ui.lbPecasReprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_reprovadas}</span></p></body></html>")
+                
+                self.io.passa_nao_passa_direito(0)
+                self.io.passa_nao_passa_esquerdo(1)
+                self.io.aciona_marcacao_esquerdo()
+
+                self.io.desaciona_pistoes_esquerdo()
+                self.ui.txaInformacoes.setText("Peça reprovada\nPressione RESET para desativar pistões e descarte uma peça.")
+            
+            if esquerda == 0 and direita == 0:
+                self.quantidade_decarte = 2
+                self.passou_nao_passou = True
+            elif esquerda == 0 and direita == 1 or esquerda == 1 and direita == 0:
+                self.quantidade_decarte = 1
+                self.passou_nao_passou = True
+
+        else:
+            self.io.desaciona_pistoes()
+
+    def sobe_pistoes(self):
+        self.io.desaciona_pistoes()
+
+    def zerar_contadores(self):
+        self.pecas_aprovadas = 0
+        self.pecas_reprovadas = 0
+        self.ui.lbPecasAprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_aprovadas}</span></p></body></html>")
+        self.ui.lbPecasReprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_reprovadas}</span></p></body></html>")
+    
     def desligar_sistema(self):
         self.shutdown_pi()
         self.close()
