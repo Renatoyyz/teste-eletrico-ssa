@@ -122,8 +122,9 @@ class TelaInicial(QMainWindow):
 
         self.inicializa_threads()
         self.ui.txaInformacoes.setText("Máquina Pronta.")
-        self.io.passa_nao_passa_direito(0)
-        self.io.passa_nao_passa_esquerdo(0)
+        self.io.apaga_pasa_nao_passa()
+        self.io.desaciona_pistoes_esquerdo()
+        self.io.desaciona_pistoes_direito()
 
     def inicializa_threads(self):
         # Atualizador Thread
@@ -144,10 +145,10 @@ class TelaInicial(QMainWindow):
     @pyqtSlot(str)
     def atualiza_valor(self, data_hora):
         if self.io.io_rpi.bot_acio_e == 0 and self.io.io_rpi.bot_acio_d == 0 and self.inicia_rotina == False:
+        # if self.io.io_rpi.bot_acio_d == 0 and self.inicia_rotina == False:
             if self._acionamento_botao < 1:
                 self.ui.txaInformacoes.setText("Iniciando rotina de teste.")
-                self.io.passa_nao_passa_direito(0)
-                self.io.passa_nao_passa_esquerdo(0)
+                self.io.apaga_pasa_nao_passa()
                 self.inicia_rotina = True # Inicia a rotina de teste
                 self._acionamento_botao += 1 # Incrementa a variável para evitar que a rotina seja iniciada mais de uma vez
 

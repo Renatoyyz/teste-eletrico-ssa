@@ -279,6 +279,12 @@ class IO_MODBUS:
             self.aciona_matriz(14,1)
         else:
             return -1
+        
+    def apaga_pasa_nao_passa(self):
+        self.aciona_matriz(13,0)
+        self.aciona_matriz(14,0)
+        self.aciona_matriz(15,0)
+        self.aciona_matriz(16,0)
 
     def aciona_marcacao_esquerdo(self):
         self.aciona_matriz(10,1)

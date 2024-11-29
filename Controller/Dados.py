@@ -5,7 +5,7 @@ class Dado:
         self.TELA_INICIAL = 0
 
         self._telas = self.TELA_INICIAL
-        self.full_scream = False
+        self.full_scream = True
     @property
     def telas(self):
         return self._telas
