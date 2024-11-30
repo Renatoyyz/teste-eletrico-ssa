@@ -52,20 +52,34 @@ class ExecutaRotinaThread(QThread):
                     self.operacao.io.aciona_matriz(1,1)# Aciona principal 1
                     self.operacao.io.aciona_matriz(2,1)# Aciona principal 2
                     self.msleep(1000) # Cria um atraso de 1 segundo
-                    self.operacao.io.aciona_matriz(5,1)# Aciona AG_inferior_1
-                    self.operacao.io.aciona_matriz(6,1)# Aciona AG_inferior_2
-                    self.msleep(1000) # Cria um atraso de 1 segundo
+                    
                     self.operacao.io.aciona_matriz(3,1)# Aciona AG_superior_1
                     self.operacao.io.aciona_matriz(4,1)# Aciona AG_superior_2
                     self.msleep(1000) # Cria um atraso de 1 segundo
+
+                    self.operacao.io.aciona_matriz(5,1)# Aciona AG_inferior_1
+                    self.operacao.io.aciona_matriz(6,0)# Desaciona AG_inferior_2
+                    self.msleep(1000) # Cria um atraso de 1 segundo
+
                     self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
                     self.msleep(self.TEMPO_TESTE) # Cria um atraso para teste dos eletrodos
 
                     self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
+                    self.msleep(500) # Cria um atraso de 1 segundo
+
+                    # Verifica se o eletrodo esquerdo foi passado
+                    self.esquerda_ok = int(self.operacao.io.io_rpi.passa_esquerdo)
+
+                    self.operacao.io.aciona_matriz(5,0)# Desaciona AG_inferior_1
+                    self.operacao.io.aciona_matriz(6,1)# Aciona AG_inferior_2
                     self.msleep(1000) # Cria um atraso de 1 segundo
 
-                    # Verifica se o eletrodo foi passado
-                    self.esquerda_ok = int(self.operacao.io.io_rpi.passa_esquerdo)
+                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
+                    self.msleep(self.TEMPO_TESTE) # Cria um atraso para teste dos eletrodos
+                    
+                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
+                    self.msleep(500) # Cria um atraso de 1 segundo
+
                     self.direita_ok = int(self.operacao.io.io_rpi.passa_direito)
 
                     # Desabilita a rotina
@@ -163,6 +177,7 @@ class TelaInicial(QMainWindow):
                     self.passou_nao_passou = False
                     self._acionamento_botao = 0
                     self.ui.txaInformacoes.setText("Máquina Pronta.")
+                    self.io.apaga_pasa_nao_passa()
 
         if self.inicia_rotina == True:
             if self.io.io_rpi.contina_luz == 0:
