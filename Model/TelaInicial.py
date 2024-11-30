@@ -40,7 +40,7 @@ class ExecutaRotinaThread(QThread):
         self._running = True
         self.esquerda_ok =0
         self.direita_ok =0
-        self.TEMPO_TESTE = 5000
+        self.TEMPO_TESTE = 2500
 
     def run(self):
         while self._running == True:
@@ -51,11 +51,11 @@ class ExecutaRotinaThread(QThread):
                     self.operacao.io.desaciona_pistoes()
                     self.operacao.io.aciona_matriz(1,1)# Aciona principal 1
                     self.operacao.io.aciona_matriz(2,1)# Aciona principal 2
-                    self.msleep(1000) # Cria um atraso de 1 segundo
+                    self.msleep(800) # Cria um atraso de 1 segundo
                     
                     self.operacao.io.aciona_matriz(3,1)# Aciona AG_superior_1
                     self.operacao.io.aciona_matriz(4,1)# Aciona AG_superior_2
-                    self.msleep(1000) # Cria um atraso de 1 segundo
+                    self.msleep(800) # Cria um atraso de 1 segundo
 
                     self.operacao.io.aciona_matriz(5,1)# Aciona AG_inferior_1
                     self.operacao.io.aciona_matriz(6,0)# Desaciona AG_inferior_2
@@ -72,7 +72,7 @@ class ExecutaRotinaThread(QThread):
 
                     self.operacao.io.aciona_matriz(5,0)# Desaciona AG_inferior_1
                     self.operacao.io.aciona_matriz(6,1)# Aciona AG_inferior_2
-                    self.msleep(1000) # Cria um atraso de 1 segundo
+                    self.msleep(800) # Cria um atraso de 1 segundo
 
                     self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
                     self.msleep(self.TEMPO_TESTE) # Cria um atraso para teste dos eletrodos

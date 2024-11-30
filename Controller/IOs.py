@@ -312,12 +312,20 @@ class IO_MODBUS:
             self.aciona_matriz(1,0)
             self.aciona_matriz(2,0)
 
-    def aciona_ag_inferior(self, value):
+    def aciona_ag_inferior_esquerdo(self, value):
         if value == 1:
             self.aciona_matriz(5,1)# Aciona AG_inferior_1
-            self.aciona_matriz(6,1)# Aciona AG_inferior_2
+            # self.aciona_matriz(6,1)# Aciona AG_inferior_2
         elif value == 0:
             self.aciona_matriz(5,0)
+            # self.aciona_matriz(6,0)
+
+    def aciona_ag_inferior_direito(self, value):
+        if value == 1:
+            # self.aciona_matriz(5,1)# Aciona AG_inferior_1
+            self.aciona_matriz(6,1)
+        elif value == 0:
+            # self.aciona_matriz(5,0)
             self.aciona_matriz(6,0)
 
     def aciona_ag_superior(self, value):
@@ -360,23 +368,27 @@ if __name__ == '__main__':
     #         print("Matriz limpa.")
     #         time.sleep(1)
     while input_ !="q" and input_ !="Q":
-        input_ = input("Digite:\n1 para acionar o pistão principal.\n2 para acionar a agulha inferior.\n3 para acionar a agulha superior\n4 para acionar a marcação esquerdo\n5 para acionar a marcação direito\nq para sair.\n")
+        input_ = input("Digite:\n1 para acionar o pistão principal.\n2 para acionar a agulha inferior esquerdo.\n3 para acionar a agulha inferior direito.\n4 para acionar a agulha superior.\n5 para acionar a marcação esquerdo.\n6 para acionar a marcação direito.\nq para sair.\n")
         if input_ == "1":
             print("Pistão principal 1=liga 0=desliga")
             out = int(input())
             io.aciona_principal(out)
         elif input_ == "2":
-            print("Agulha inferior 1=liga 0=desliga")
+            print("Agulha inferior esquedo 1=liga 0=desliga")
             out = int(input())
-            io.aciona_ag_inferior(out)
+            io.aciona_ag_inferior_esquerdo(out)
         elif input_ == "3":
+            print("Agulha inferior direito 1=liga 0=desliga")
+            out = int(input())
+            io.aciona_ag_inferior_direito(out)
+        elif input_ == "4":
             print("Agulha superior 1=liga 0=desliga")
             out = int(input())
             io.aciona_ag_superior(out)
-        elif input_ == "4":
+        elif input_ == "5":
             print("Aciona marcação esquerdo")
             io.aciona_marcacao_esquerdo()
-        elif input_ == "5":
+        elif input_ == "6":
             print("Aciona marcação direito")
             io.aciona_marcacao_direito()
             
