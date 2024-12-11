@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal,pyqtSlot, QMetaObject, Q_ARG
 import os
 import time
 from datetime import datetime
+from Model.TelaConfig import TelaConfig
 
 from View.tela_inicial import Ui_fmTelaInicial
 
@@ -133,6 +134,7 @@ class TelaInicial(QMainWindow):
         self.mouseReleaseEvent = self.setfoccus
         self.ui.btReset.clicked.connect(self.sobe_pistoes)
         self.ui.btZerar.clicked.connect(self.zerar_contadores)
+        self.ui.btConfigurar.clicked.connect(self.configurar)
 
         self.inicializa_threads()
         self.ui.txaInformacoes.setText("Máquina Pronta.")
@@ -184,7 +186,7 @@ class TelaInicial(QMainWindow):
                 self.inicia_rotina = False
                 self._acionamento_botao = 0
                 self.io.desaciona_pistoes()
-                self.ui.txaInformacoes.setText("Invasão detectada.\nConfira as peças a acione novamente.")
+                self.ui.txaInformacoes.setText("Invasão detectada.\nConfira as peças e acione novamente.")
 
     def thread_execucao(self, esquerda, direita):
         QMetaObject.invokeMethod(self, "execucao", Qt.QueuedConnection, 
@@ -259,6 +261,10 @@ class TelaInicial(QMainWindow):
         self.ui.lbPecasAprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_aprovadas}</span></p></body></html>")
         self.ui.lbPecasReprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_reprovadas}</span></p></body></html>")
     
+    def configurar(self):
+        configurar = TelaConfig(dado=self.dado, io=self.io)
+        configurar.exec_()
+
     def desligar_sistema(self):
         self.shutdown_pi()
         self.close()
@@ -270,8 +276,10 @@ class TelaInicial(QMainWindow):
 
 
     def closeEvent(self, event):
+        self.atualizador.parar()
+        self.execucao_.parar()
         event.accept()
 
     def setfoccus(self, event):
-        if self.io.io_rpi.bot_acio_d == 0:
+        if self.io.io_rpi.bot_acio_d == 1:
             self.close()

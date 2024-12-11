@@ -124,7 +124,7 @@ def select_channel_circuit_break(channel):
         mux_pins[1].value(0)
         mux_pins[2].value(1)
         mux_pins[3].value(1)
-    elif channel == 14:# Converte para binário o número 14
+    elif channel == 14:# Converte para binário o500 número 14
         mux_pins[0].value(0)
         mux_pins[1].value(1)
         mux_pins[2].value(1)

@@ -16,9 +16,9 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>60</x>
      <y>70</y>
-     <width>260</width>
+     <width>280</width>
      <height>61</height>
     </rect>
    </property>
@@ -29,9 +29,9 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>930</x>
+     <x>920</x>
      <y>70</y>
-     <width>251</width>
+     <width>290</width>
      <height>61</height>
     </rect>
    </property>
@@ -97,7 +97,7 @@
   <widget class="QPushButton" name="btZerar">
    <property name="geometry">
     <rect>
-     <x>398</x>
+     <x>400</x>
      <y>600</y>
      <width>130</width>
      <height>70</height>
@@ -128,6 +128,24 @@
    </property>
    <property name="text">
     <string>RESET</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btConfigurar">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>600</y>
+     <width>170</width>
+     <height>70</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>18</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>CONFIGURAR</string>
    </property>
   </widget>
  </widget>

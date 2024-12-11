@@ -7,8 +7,8 @@ class FakeRPiGPIO:
     PUD_UP = "PUD_UP"
     IN = "IN"
     OUT = "OUT"
-    HIGH = 1
-    LOW = 0
+    HIGH = 0
+    LOW = 1
 
     def __init__(self):
         self.pins = {}
@@ -105,6 +105,7 @@ class IO_MODBUS:
         self.io_rpi = InOut()
 
         self.fake_modbus = False
+        self.ser = None
         try:
             self.ser = serial.Serial(
                                         port='/dev/ttyUSB0',  # Porta serial padrão no Raspberry Pi 4
@@ -259,6 +260,10 @@ class IO_MODBUS:
         # Principais
         self.aciona_matriz(2,0)
         time.sleep(0.5)
+    
+    # ***********************************************************************      
+
+    # ***********************************************************************
 
     def passa_nao_passa_esquerdo(self, value):
         if value == 1:
@@ -312,6 +317,22 @@ class IO_MODBUS:
             self.aciona_matriz(1,0)
             self.aciona_matriz(2,0)
 
+    def aciona_principal_esquerdo(self, value):
+        if value == 1:
+            self.aciona_matriz(1,1)
+        elif value == 0:
+            self.aciona_matriz(1,0)
+        else:
+            return -1
+        
+    def aciona_principal_direito(self, value):
+        if value == 1:
+            self.aciona_matriz(2,1)
+        elif value == 0:
+            self.aciona_matriz(2,0)
+        else:
+            return -1
+
     def aciona_ag_inferior_esquerdo(self, value):
         if value == 1:
             self.aciona_matriz(5,1)# Aciona AG_inferior_1
@@ -327,6 +348,22 @@ class IO_MODBUS:
         elif value == 0:
             # self.aciona_matriz(5,0)
             self.aciona_matriz(6,0)
+
+    def aciona_ag_superior_esquerdo(self, value):
+        if value == 1:
+            self.aciona_matriz(3,1)
+        elif value == 0:
+            self.aciona_matriz(3,0)
+        else:
+            return -1
+        
+    def aciona_ag_superior_direito(self, value):
+        if value == 1:
+            self.aciona_matriz(4,1)
+        elif value == 0:
+            self.aciona_matriz(4,0)
+        else:
+            return -1
 
     def aciona_ag_superior(self, value):
         if value == 1:
