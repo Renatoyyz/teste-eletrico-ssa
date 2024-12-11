@@ -41,7 +41,9 @@ class ExecutaRotinaThread(QThread):
         self._running = True
         self.esquerda_ok =0
         self.direita_ok =0
-        self.TEMPO_TESTE = 2500
+        self.TEMPO_TESTE = 800
+
+        self.falha = False
 
     def run(self):
         while self._running == True:
@@ -52,49 +54,74 @@ class ExecutaRotinaThread(QThread):
                     self.operacao.io.desaciona_pistoes()
                     self.operacao.io.aciona_matriz(1,1)# Aciona principal 1
                     self.operacao.io.aciona_matriz(2,1)# Aciona principal 2
-                    self.msleep(800) # Cria um atraso de 1 segundo
+                    if self.meu_timer(800) == False: # Cria um atraso de 1 segundo
                     
-                    self.operacao.io.aciona_matriz(3,1)# Aciona AG_superior_1
-                    self.operacao.io.aciona_matriz(4,1)# Aciona AG_superior_2
-                    self.msleep(800) # Cria um atraso de 1 segundo
+                        self.operacao.io.aciona_matriz(3,1)# Aciona AG_superior_1
+                        self.operacao.io.aciona_matriz(4,1)# Aciona AG_superior_2
+                        if self.meu_timer(800) == False: # Cria um atraso de 1 segundo
 
-                    self.operacao.io.aciona_matriz(5,1)# Aciona AG_inferior_1
-                    self.operacao.io.aciona_matriz(6,0)# Desaciona AG_inferior_2
-                    self.msleep(1000) # Cria um atraso de 1 segundo
+                            self.operacao.io.aciona_matriz(5,1)# Aciona AG_inferior_1
+                            self.operacao.io.aciona_matriz(6,0)# Desaciona AG_inferior_2
+                            if self.meu_timer(2000) == False: # Cria um atraso de 1 segundo
 
-                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
-                    self.msleep(self.TEMPO_TESTE) # Cria um atraso para teste dos eletrodos
+                                self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
+                                if self.meu_timer(self.TEMPO_TESTE) ==  False:# Cria um atraso para teste dos eletrodos
 
-                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
-                    self.msleep(500) # Cria um atraso de 1 segundo
+                                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
+                                    if self.meu_timer(500) == False: # Cria um atraso de 1 segundo
 
-                    # Verifica se o eletrodo esquerdo foi passado
-                    self.esquerda_ok = int(self.operacao.io.io_rpi.passa_esquerdo)
+                                        self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
+                                        if self.meu_timer(self.TEMPO_TESTE) == False:# Cria um atraso para teste dos eletrodos
 
-                    self.operacao.io.aciona_matriz(5,0)# Desaciona AG_inferior_1
-                    self.operacao.io.aciona_matriz(6,1)# Aciona AG_inferior_2
-                    self.msleep(800) # Cria um atraso de 1 segundo
+                                            self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
+                                            if self.meu_timer(500) == False:# Cria um atraso de 1 segundo
 
-                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
-                    self.msleep(self.TEMPO_TESTE) # Cria um atraso para teste dos eletrodos
-                    
-                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
-                    self.msleep(500) # Cria um atraso de 1 segundo
+                                                # Verifica se o eletrodo esquerdo foi passado
+                                                self.esquerda_ok = int(self.operacao.io.io_rpi.passa_esquerdo)
 
-                    self.direita_ok = int(self.operacao.io.io_rpi.passa_direito)
+                                                self.operacao.io.aciona_matriz(5,0)# Desaciona AG_inferior_1
+                                                self.operacao.io.aciona_matriz(6,1)# Aciona AG_inferior_2
+                                                if self.meu_timer(2000) == False:# Cria um atraso de 1 segundo
 
-                    # Desabilita a rotina
-                    self.operacao.inicia_rotina = False
-                    
+                                                    self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
+                                                    if self.meu_timer(self.TEMPO_TESTE) == False:# Cria um atraso para teste dos eletrodos
+                                                    
+                                                        self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
+                                                        if self.meu_timer(500) == False:# Cria um atraso de 1 segundo
+
+                                                            self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
+                                                            if self.meu_timer(self.TEMPO_TESTE) == False:# Cria um atraso para teste dos eletrodos
+
+                                                                self.operacao.io.io_rpi.aciona_leitor_eletrodo(0)# Desliga o leitor de eletrodo
+                                                                if self.meu_timer(500) == False:# Cria um atraso de 1 segundo
+
+                                                                    self.direita_ok = int(self.operacao.io.io_rpi.passa_direito)
+
                     # Emite o evento para conclusão so processo
-                    self.sinal_execucao.emit(self.esquerda_ok,self.direita_ok)
-                    # self.sinal_execucao.emit(0,0)
-                    # self.parar()
+                    if self.falha == False:
+                        # Desabilita a rotina
+                        self.operacao.inicia_rotina = False
+                        self.sinal_execucao.emit(self.esquerda_ok,self.direita_ok)
+                    else:
+                        # Desabilita a rotina
+                        self.operacao.inicia_rotina = False
+                        self.sinal_execucao.emit(-1,-1)
                     
                 self.msleep(100)  # Cria um atraso de 100 mili segundo
             except Exception as e:
                     print(f"Erro na Thread ExecutaRotina: {e}")
                     self.parar()
+
+    def meu_timer(self, ms):
+        self.falha = False
+        for i in range(ms):
+            if self.operacao.io.io_rpi.sensor_descarte == 1:
+                self.msleep(1)
+            else:
+                self.falha = True
+                break
+        return self.falha
+    
     def iniciar(self):
         self._running = True
         self.start()
@@ -181,20 +208,13 @@ class TelaInicial(QMainWindow):
                     self.ui.txaInformacoes.setText("Máquina Pronta.")
                     self.io.apaga_pasa_nao_passa()
 
-        if self.inicia_rotina == True:
-            if self.io.io_rpi.contina_luz == 0:
-                self.inicia_rotina = False
-                self._acionamento_botao = 0
-                self.io.desaciona_pistoes()
-                self.ui.txaInformacoes.setText("Invasão detectada.\nConfira as peças e acione novamente.")
-
     def thread_execucao(self, esquerda, direita):
         QMetaObject.invokeMethod(self, "execucao", Qt.QueuedConnection, 
                                  Q_ARG(int, esquerda), Q_ARG(int, direita))
 
     @pyqtSlot(int, int)
     def execucao(self,  esquerda, direita):
-        if self._acionamento_botao > 0:
+        if (self._acionamento_botao > 0) and ( esquerda != -1 and direita != -1):
             if esquerda == 1 and direita == 1:
                 self.pecas_aprovadas += 2
                 self.ui.lbPecasAprovadas.setText(f"<html><head/><body><p align=\"center\"><span style=\" font-size:24pt; font-weight:600;\">{self.pecas_aprovadas}</span></p></body></html>")
@@ -249,8 +269,11 @@ class TelaInicial(QMainWindow):
                 self.quantidade_decarte = 1
                 self.passou_nao_passou = True
 
-        else:
+        elif esquerda == -1 and direita == -1:
+            self.inicia_rotina = False
+            self._acionamento_botao = 0
             self.io.desaciona_pistoes()
+            self.ui.txaInformacoes.setText("Invasão detectada.\nConfira as peças e acione novamente.")
 
     def sobe_pistoes(self):
         self.io.desaciona_pistoes()
@@ -281,5 +304,5 @@ class TelaInicial(QMainWindow):
         event.accept()
 
     def setfoccus(self, event):
-        if self.io.io_rpi.bot_acio_d == 1:
+        if self.io.io_rpi.bot_acio_d == 0:
             self.close()

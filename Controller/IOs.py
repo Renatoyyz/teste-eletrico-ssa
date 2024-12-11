@@ -7,8 +7,8 @@ class FakeRPiGPIO:
     PUD_UP = "PUD_UP"
     IN = "IN"
     OUT = "OUT"
-    HIGH = 0
-    LOW = 1
+    HIGH = 1
+    LOW = 0
 
     def __init__(self):
         self.pins = {}
