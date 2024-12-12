@@ -13,4 +13,3 @@ if __name__ == "__main__":
     window = TelaInicial(io=io, dado=dado)
     window.show()
     sys.exit([app.exec(), io.ser.close()])
-

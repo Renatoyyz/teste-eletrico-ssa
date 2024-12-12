@@ -41,7 +41,7 @@ class ExecutaRotinaThread(QThread):
         self._running = True
         self.esquerda_ok =0
         self.direita_ok =0
-        self.TEMPO_TESTE = 800
+        self.TEMPO_TESTE = 400
 
         self.falha = False
 
@@ -62,7 +62,7 @@ class ExecutaRotinaThread(QThread):
 
                             self.operacao.io.aciona_matriz(5,1)# Aciona AG_inferior_1
                             self.operacao.io.aciona_matriz(6,0)# Desaciona AG_inferior_2
-                            if self.meu_timer(2000) == False: # Cria um atraso de 1 segundo
+                            if self.meu_timer(1000) == False: # Cria um atraso de 1 segundo
 
                                 self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
                                 if self.meu_timer(self.TEMPO_TESTE) ==  False:# Cria um atraso para teste dos eletrodos
@@ -81,7 +81,7 @@ class ExecutaRotinaThread(QThread):
 
                                                 self.operacao.io.aciona_matriz(5,0)# Desaciona AG_inferior_1
                                                 self.operacao.io.aciona_matriz(6,1)# Aciona AG_inferior_2
-                                                if self.meu_timer(2000) == False:# Cria um atraso de 1 segundo
+                                                if self.meu_timer(1000) == False:# Cria um atraso de 1 segundo
 
                                                     self.operacao.io.io_rpi.aciona_leitor_eletrodo(1)# Aciona o leitor de eletrodo
                                                     if self.meu_timer(self.TEMPO_TESTE) == False:# Cria um atraso para teste dos eletrodos
